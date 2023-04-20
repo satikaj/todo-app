@@ -1,12 +1,12 @@
-import { Controller, Get, Query } from '@nestjs/common';
-import { AppService, KeyValuePair } from './app.service';
+import { Controller, Get, Param } from '@nestjs/common';
+import { AppService, TodoObj } from './app.service';
 
 @Controller()
 export class AppController {
   constructor(private readonly appService: AppService) {}
 
-  @Get('hello')
-  getJsonGreeting(@Query('name') name: string): KeyValuePair {
-    return this.appService.getJsonGreeting(name);
+  @Get('todo/:id')
+  getTodo(@Param('id') id: number): TodoObj {
+    return this.appService.getTodo(id);
   }
 }

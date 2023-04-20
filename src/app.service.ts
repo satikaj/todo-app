@@ -1,12 +1,21 @@
 import { Injectable } from '@nestjs/common';
 
-export interface KeyValuePair{
-  [key: string]: string;
+export interface TodoObj {
+  id: number;
+  todo: string;
 }
+
+const todos: Array<TodoObj> = [
+  { id: 1, todo: 'Todo item 1' },
+  { id: 2, todo: 'Todo item 2' },
+  { id: 3, todo: 'Todo item 3' },
+];
 
 @Injectable()
 export class AppService {
-  getJsonGreeting(name: string): KeyValuePair {
-    return {'greet': name};
+  getTodo(idNo: number): TodoObj {
+    for (let i = 0; i < todos.length; i++) {
+      if (todos[i]['id'] == idNo) return todos[i];
+    }
   }
 }
