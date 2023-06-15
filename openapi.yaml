@@ -1,8 +1,16 @@
 openapi: 3.0.3
 info:
   title: Todo App
-  description: RESTful todo application to manage tasks.
+  description: |-
+    This is a todo application back-end that follows the REST API standard and OpenAPI 3.0 specification and provides full functionality for managing tasks.
+  contact:
+    email: satikajayawardena@proton.me
   version: 1.0.0
+externalDocs:
+  description: The Todo App repository
+  url: https://github.com/satikaj/RESTful-app
+servers:
+  - url: http://localhost:3000
 tags:
   - name: todo
     description: Manage todo items
@@ -10,6 +18,21 @@ tags:
     description: Manage user account
 paths:
   /todo:
+    get:
+      tags:
+        - todo
+      summary: Get all todos
+      description: Get all todos of the current user
+      operationId: getAllTodos
+      responses:
+        '200':
+          description: Successfully found all todos
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/TodoResponse'
     post:
       tags:
         - todo
@@ -19,16 +42,23 @@ paths:
       requestBody:
         $ref: '#/components/requestBodies/Todo'
       responses:
-        '200':
-          $ref: '#/components/responses/Todo200'
-        '405':
-          description: Invalid input
+        '201':
+          description: Successfully created todo
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TodoResponse'          
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/TodoResponse'
+        '400':
+          description: Invalid input for todo
   /todo/{id}:
     get:
       tags:
         - todo
       summary: Find todo by ID
-      description: Returns the todo item of the same id
+      description: Returns the todo item of the specified id
       operationId: getTodoById
       parameters:
         - name: id
@@ -40,16 +70,21 @@ paths:
             format: int64
       responses:
         '200':
-          $ref: '#/components/responses/Todo200'
-        '400':
-          description: Invalid ID supplied
+          description: Found todo
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TodoResponse'          
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/TodoResponse'
         '404':
-          description: Todo not found
+          description: Todo of given ID does not exist
     put:
       tags:
         - todo
       summary: Update an existing todo item
-      description: Update an existing todo item by id
+      description: Update an existing todo item by ID
       operationId: updateTodo
       parameters:
         - name: id
@@ -63,38 +98,41 @@ paths:
         $ref: '#/components/requestBodies/Todo'
       responses:
         '200':
-          $ref: '#/components/responses/Todo200'
-        '400':
-          description: Invalid ID supplied
+          description: Successfully updated todo
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TodoResponse'          
+            application/xml:
+              schema:
+                $ref: '#/components/schemas/TodoResponse'
         '404':
-          description: Todo not found
-        '405':
-          description: Validation exception
+          description: Todo of given ID does not exist
     delete:
       tags:
         - todo
-      summary: Deletes a todo item
-      description: Delete a todo item
+      summary: Delete a todo item
+      description: Delete a todo item by ID
       operationId: deleteTodo
       parameters:
         - name: id
           in: path
-          description: Todo id to delete
+          description: ID of todo to delete
           required: true
           schema:
             type: integer
             format: int64
       responses:
-        '200':
-          description: successful operation
-        '400':
-          description: Invalid todo value
+        '204':
+          description: Successfully deleted todo
+        '404':
+          description: Todo of given ID does not exist
   /todo/{id}/complete:
     patch:
       tags:
         - todo
       summary: Complete todo
-      description: Complete todo
+      description: Complete todo by ID
       operationId: completeTodo
       parameters:
         - name: id
@@ -105,104 +143,77 @@ paths:
             type: integer
             format: int64
       responses:
-        '200':
-          description: successful operation
-        '400':
-          description: Invalid ID supplied
+        '204':
+          description: Successfully completed todo
         '404':
-          description: Todo not found
-  /user:
+          description: Todo of given ID does not exist
+  /user/register:
     post:
       tags:
         - user
       summary: Create user
-      description: This can only be done by the logged in user.
+      description: Register a user account
       operationId: createUser
       requestBody:
         $ref: '#/components/requestBodies/User'
       responses:
-        default:
-          description: successful operation
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/User'
-            application/xml:
-              schema:
-                $ref: '#/components/schemas/User'
+        '201':
+          description: Successfully created user account
   /user/login:
     get:
       tags:
         - user
-      summary: Logs user into the system
-      description: ''
+      summary: Login user
+      description: Logs user into the system
       operationId: loginUser
-      parameters:
-        - name: email
-          in: query
-          description: The email for login
-          required: false
-          schema:
-            type: string
-        - name: password
-          in: query
-          description: The password for login in clear text
-          required: false
-          schema:
-            type: string
-      responses:
-        '200':
-          description: successful operation
-        '400':
-          description: Invalid email/password supplied
-  /user/logout:
-    get:
-      tags:
-        - user
-      summary: Logs out current logged in user session
-      description: ''
-      operationId: logoutUser
-      parameters: []
-      responses:
-        '200':
-          description: successful operation
-  /user/{email}:
-    put:
-      tags:
-        - user
-      summary: Update user
-      description: This can only be done by the logged in user.
-      operationId: updateUser
-      parameters:
-        - name: email
-          in: path
-          description: The email that need to be updated
-          required: true
-          schema:
-            type: string
       requestBody:
         $ref: '#/components/requestBodies/User'
       responses:
         '200':
-          description: successful operation
-    delete:
+          description: Successfully logged in
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthResponse'
+        '404':
+          description: Account with the given email and password does not exist
+  /user/logout:
+    get:
       tags:
         - user
-      summary: Delete user
-      description: This can only be done by the logged in user.
-      operationId: deleteUser
+      summary: Log out user
+      description: Logs out the currently logged in user
+      operationId: logoutUser
+      responses:
+        '200':
+          description: Successfully logged out user
+  /user/{email}:
+    put:
+      tags:
+        - user
+      summary: Update account email
+      description: Update the email linked to the currently logged in account
+      operationId: updateUser
       parameters:
         - name: email
           in: path
-          description: The email that needs to be deleted
+          description: The email to be updated
           required: true
           schema:
             type: string
       responses:
-        '400':
-          description: Invalid email supplied
-        '404':
-          description: User not found
+        '204':
+          description: Successfully updated account email
+  /user/delete:
+    delete:
+      tags:
+        - user
+      summary: Delete user
+      description: Delete the currently logged in user account
+      operationId: deleteUser
+      responses:
+        '204':
+          description: Successfully deleted user account
 components:
   schemas:
     TodoRequest:
@@ -267,10 +278,14 @@ components:
         password:
           type: string
           example: '12345'
-      xml:
-        name: user
+    AuthResponse:
+      type: object
+      properties:
+        token:
+          type: string
   requestBodies:
     Todo:
+      required: true
       description: Todo item details
       content:
         application/json:
@@ -282,8 +297,8 @@ components:
         application/x-www-form-urlencoded:
           schema:
             $ref: '#/components/schemas/TodoRequest'
-      required: true
     User:
+      required: true
       description: User account details
       content:
         application/json:
@@ -295,19 +310,10 @@ components:
         application/x-www-form-urlencoded:
           schema:
             $ref: '#/components/schemas/User'
-  responses:
-    Todo200:
-      description: Successful operation
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/TodoResponse'          
-        application/xml:
-          schema:
-            $ref: '#/components/schemas/TodoResponse'
   securitySchemes:
-    BasicAuth:
+    TodoAuth:
       type: http
-      scheme: basic
+      scheme: bearer
+      bearerFormat: JWT
 security:
-  - BasicAuth: []
+  - TodoAuth: []
