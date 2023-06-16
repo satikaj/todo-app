@@ -1,4 +1,4 @@
-import { Priority } from './app.service';
+import { Priority } from '../priority.enum'
 
 export class TodoDto {
     title: string;
