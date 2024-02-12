@@ -2,7 +2,7 @@ import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { Todo } from './todo/todo.entity'
+import { Todo } from './todo/todo.entity';
 import { TodoModule } from './todo/todo.module';
 
 @Module({
@@ -17,7 +17,7 @@ import { TodoModule } from './todo/todo.module';
     }),
     TodoModule,
   ],
-  controllers: [],
-  providers: [],
+  controllers: [AppController],
+  providers: [AppService],
 })
 export class AppModule {}
