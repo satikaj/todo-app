@@ -1,5 +1,6 @@
 import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
-import { Priority } from './priority.enum'
+import { Priority } from './type/priority.enum';
+import { Category } from './type/category.enum';
 
 @Entity()
 export class Todo {
@@ -9,17 +10,17 @@ export class Todo {
   @Column()
   title: string;
 
-  @Column()
+  @Column({ nullable: true })
   notes: string;
 
-  @Column()
-  dueDate: string;
+  @Column({ nullable: true })
+  dueDate: Date;
 
-  @Column()
+  @Column({ nullable: true })
   priority: Priority;
 
-  @Column()
-  category: string;
+  @Column({ nullable: true })
+  category: Category;
 
   @Column({ default: false })
   isCompleted: boolean;
